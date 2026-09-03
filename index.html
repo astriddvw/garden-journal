@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Garden Journal</title>
+    <style>
+        :root {
+            --primary-color: #2c5e3b;
+            --primary-hover: #1e4027;
+            --bg-color: #f4f7f4;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #d1ded1;
+            --accent-bg: #e8f0e8;
+            --accent-border: #b8d0b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.2rem 2rem;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            letter-spacing: 0.5px;
+        }
+
+        .tabs-container {
+            display: flex;
+            background-color: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+            padding: 0 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.4rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 950px) {
+            .tab-content.active {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-bg);
+        }
+
+        /* Planning Box */
+        .planning-box {
+            background-color: var(--accent-bg);
+            border: 1px solid var(--accent-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .planning-box h3 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .planning-list {
+            list-style-type: none;
+            margin-bottom: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .planning-list li {
+            background: white;
+            padding: 0.6rem 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            border: 1px solid #e0e8e0;
+        }
+
+        .planning-list li button {
+            background: none;
+            border: none;
+            color: #cc0000;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.4rem;
+        }
+        
+        .planning-list li button:hover {
+            background-color: #ffeeee;
+            border-radius: 3px;
+        }
+
+        /* Forms & Inputs */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(44, 94, 59, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input[type="file"] {
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Entries Feed */
+        .entries-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .entry-card {
+            background: #fafcfa;
+            border: 1px solid #e2ebe2;
+            border-radius: 6px;
+            padding: 1.2rem;
+            position: relative;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            font-size: 0.85rem;
+            color: #666;
+            border-bottom: 1px dashed #d5ded5;
+            padding-bottom: 0.4rem;
+        }
+
+        .entry-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.05rem;
+        }
+
+        .entry-body {
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        .entry-image-container {
+            max-width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .entry-image-container img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        .delete-entry-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .delete-entry-btn:hover {
+            color: #cc0000;
+        }
+
+        /* Plants Grid */
+        .plants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .plant-card {
+            background: #fafcfa;
+            border: 1px solid #e2ebe2;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .plant-img-wrapper {
+            width: 100%;
+            height: 160px;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .plant-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .plant-card-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .plant-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.05rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .plant-notes {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+        }
+
+        .plant-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .export-import-bar {
+            max-width: 1400px;
+            margin: 0 auto 1.5rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background-color: #555;
+        }
+        .btn-secondary:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <header>My Garden</header>
+
+    <div class="export-import-bar">
+        <button class="btn btn-secondary" onclick="exportData()">Backup Data (JSON)</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Restore Data</button>
+        <input type="file" id="importFile" style="display: none" accept=".json" onchange="importData(event)">
+    </div>
+
+    <div class="tabs-container" id="navTabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'shaded')">Back Shaded Area</button>
+        <button class="tab-btn" onclick="switchTab(event, 'rockery')">Rockery</button>
+        <button class="tab-btn" onclick="switchTab(event, 'veggie')">Vegetable Section</button>
+        <button class="tab-btn" onclick="switchTab(event, 'front-rocky')">Front Rocky Section</button>
+        <button class="tab-btn" onclick="switchTab(event, 'misc')">Miscellaneous</button>
+        <button class="tab-btn" onclick="switchTab(event, 'plants')">Plants Database</button>
+    </div>
+
+    <main>
+        <!-- BACK SHADED AREA -->
+        <div id="shaded" class="tab-content active">
+            <div class="main-column">
+                <div class="card">
+                    <h2>Back Shaded Area Journal</h2>
+                    <form onsubmit="addEntry(event, 'shaded')">
+                        <div class="input-group">
+                            <label>Entry Title / Focus</label>
+                            <input type="text" id="shaded-title" placeholder="e.g., Fern planting progress" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Date</label>
+                            <input type="date" id="shaded-date" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Notes & Observations</label>
+                            <textarea id="shaded-notes" placeholder="How are the plants doing? Any changes made?"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="shaded-photo" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Add Entry</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>History & Logs</h2>
+                    <div id="shaded-entries" class="entries-feed"></div>
+                </div>
+            </div>
+            <div class="sidebar-column">
+                <div class="planning-box">
+                    <h3>Plans & To-Dos</h3>
+                    <ul id="shaded-plans" class="planning-list"></ul>
+                    <div class="input-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="shaded-plan-input" placeholder="Add a plan item...">
+                    </div>
+                    <button class="btn" style="width: 100%; font-size: 0.85rem;" onclick="addPlan('shaded')">Add Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROCKERY -->
+        <div id="rockery" class="tab-content">
+            <div class="main-column">
+                <div class="card">
+                    <h2>Rockery Journal</h2>
+                    <form onsubmit="addEntry(event, 'rockery')">
+                        <div class="input-group">
+                            <label>Entry Title / Focus</label>
+                            <input type="text" id="rockery-title" placeholder="e.g., Succulent arrangement update" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Date</label>
+                            <input type="date" id="rockery-date" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Notes & Observations</label>
+                            <textarea id="rockery-notes" placeholder="Notes on growth, layout adjustments, watering..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="rockery-photo" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Add Entry</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>History & Logs</h2>
+                    <div id="rockery-entries" class="entries-feed"></div>
+                </div>
+            </div>
+            <div class="sidebar-column">
+                <div class="planning-box">
+                    <h3>Plans & To-Dos</h3>
+                    <ul id="rockery-plans" class="planning-list"></ul>
+                    <div class="input-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="rockery-plan-input" placeholder="Add a plan item...">
+                    </div>
+                    <button class="btn" style="width: 100%; font-size: 0.85rem;" onclick="addPlan('rockery')">Add Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VEGETABLE SECTION -->
+        <div id="veggie" class="tab-content">
+            <div class="main-column">
+                <div class="card">
+                    <h2>Vegetable Section Journal</h2>
+                    <form onsubmit="addEntry(event, 'veggie')">
+                        <div class="input-group">
+                            <label>Entry Title / Focus</label>
+                            <input type="text" id="veggie-title" placeholder="e.g., Tomato harvest / Planting seeds" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Date</label>
+                            <input type="date" id="veggie-date" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Notes & Observations</label>
+                            <textarea id="veggie-notes" placeholder="Yield info, pest control, crop rotation plans..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="veggie-photo" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Add Entry</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>History & Logs</h2>
+                    <div id="veggie-entries" class="entries-feed"></div>
+                </div>
+            </div>
+            <div class="sidebar-column">
+                <div class="planning-box">
+                    <h3>Plans & To-Dos</h3>
+                    <ul id="veggie-plans" class="planning-list"></ul>
+                    <div class="input-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="veggie-plan-input" placeholder="Add a plan item...">
+                    </div>
+                    <button class="btn" style="width: 100%; font-size: 0.85rem;" onclick="addPlan('veggie')">Add Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FRONT ROCKY SECTION -->
+        <div id="front-rocky" class="tab-content">
+            <div class="main-column">
+                <div class="card">
+                    <h2>Front Rocky Section Journal</h2>
+                    <form onsubmit="addEntry(event, 'front-rocky')">
+                        <div class="input-group">
+                            <label>Entry Title / Focus</label>
+                            <input type="text" id="front-rocky-title" placeholder="e.g., Curb appeal plantings" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Date</label>
+                            <input type="date" id="front-rocky-date" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Notes & Observations</label>
+                            <textarea id="front-rocky-notes" placeholder="How is the front aesthetic holding up?"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="front-rocky-photo" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Add Entry</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>History & Logs</h2>
+                    <div id="front-rocky-entries" class="entries-feed"></div>
+                </div>
+            </div>
+            <div class="sidebar-column">
+                <div class="planning-box">
+                    <h3>Plans & To-Dos</h3>
+                    <ul id="front-rocky-plans" class="planning-list"></ul>
+                    <div class="input-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="front-rocky-plan-input" placeholder="Add a plan item...">
+                    </div>
+                    <button class="btn" style="width: 100%; font-size: 0.85rem;" onclick="addPlan('front-rocky')">Add Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MISCELLANEOUS -->
+        <div id="misc" class="tab-content">
+            <div class="main-column">
+                <div class="card">
+                    <h2>Miscellaneous Section Journal</h2>
+                    <form onsubmit="addEntry(event, 'misc')">
+                        <div class="input-group">
+                            <label>Entry Title / Focus</label>
+                            <input type="text" id="misc-title" placeholder="e.g., Composting setup / Tool shed cleanup" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Date</label>
+                            <input type="date" id="misc-date" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Notes & Observations</label>
+                            <textarea id="misc-notes" placeholder="General garden projects or notes not fitting elsewhere..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="misc-photo" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Add Entry</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>History & Logs</h2>
+                    <div id="misc-entries" class="entries-feed"></div>
+                </div>
+            </div>
+            <div class="sidebar-column">
+                <div class="planning-box">
+                    <h3>Plans & To-Dos</h3>
+                    <ul id="misc-plans" class="planning-list"></ul>
+                    <div class="input-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="misc-plan-input" placeholder="Add a plan item...">
+                    </div>
+                    <button class="btn" style="width: 100%; font-size: 0.85rem;" onclick="addPlan('misc')">Add Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLANTS DATABASE -->
+        <div id="plants" class="tab-content">
+            <div class="main-column" style="grid-column: 1 / -1;">
+                <div class="card">
+                    <h2>Add New Plant Entry</h2>
+                    <form onsubmit="addPlant(event)">
+                        <div class="input-group">
+                            <label>Plant Name / Variety</label>
+                            <input type="text" id="plant-name" placeholder="e.g., Japanese Painted Fern" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Notes & Care Guidelines</label>
+                            <textarea id="plant-notes" placeholder="Light requirements, watering needs, pruning tips, location planted..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="plant-photo" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn">Add Plant to Directory</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Plant Directory</h2>
+                    <div id="plants-container" class="plants-grid"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Set today's date automatically on date inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                input.value = today;
+            });
+            loadData();
+        });
+
+        // Tab Switching Logic
+        function switchTab(evt, tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        // Local Storage State Structure
+        let gardenData = JSON.parse(localStorage.getItem('myGardenData')) || {
+            sections: {
+                shaded: { entries: [], plans: [] },
+                rockery: { entries: [], plans: [] },
+                veggie: { entries: [], plans: [] },
+                'front-rocky': { entries: [], plans: [] },
+                misc: { entries: [], plans: [] }
+            },
+            plants: []
+        };
+
+        function saveData() {
+            localStorage.setItem('myGardenData', JSON.stringify(gardenData));
+        }
+
+        // Helper to convert images to Base64 safely for localStorage
+        function processImageAndCallback(fileInput, callback) {
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    callback(e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                callback(null);
+            }
+        }
+
+        // Add Journal Entry
+        function addEntry(event, sectionKey) {
+            event.preventDefault();
+            const title = document.getElementById(`${sectionKey}-title`).value;
+            const date = document.getElementById(`${sectionKey}-date`).value;
+            const notes = document.getElementById(`${sectionKey}-notes`).value;
+            const fileInput = document.getElementById(`${sectionKey}-photo`);
+
+            processImageAndCallback(fileInput, (imageStr) => {
+                const newEntry = {
+                    id: Date.now(),
+                    title,
+                    date,
+                    notes,
+                    image: imageStr
+                };
+
+                gardenData.sections[sectionKey].entries.unshift(newEntry);
+                saveData();
+                renderEntries(sectionKey);
+
+                // Reset form
+                event.target.reset();
+                document.getElementById(`${sectionKey}-date`).value = new Date().toISOString().split('T')[0];
+            });
+        }
+
+        function deleteEntry(sectionKey, entryId) {
+            gardenData.sections[sectionKey].entries = gardenData.sections[sectionKey].entries.filter(e => e.id !== entryId);
+            saveData();
+            renderEntries(sectionKey);
+        }
+
+        function renderEntries(sectionKey) {
+            const container = document.getElementById(`${sectionKey}-entries`);
+            const entries = gardenData.sections[sectionKey].entries;
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<p style="color: #777; font-size: 0.9rem;">No entries added yet for this section.</p>';
+                return;
+            }
+
+            container.innerHTML = entries.map(entry => `
+                <div class="entry-card">
+                    <div class="entry-header">
+                        <span><strong>${entry.date}</strong></span>
+                        <button class="delete-entry-btn" onclick="deleteEntry('${sectionKey}', ${entry.id})">Delete</button>
+                    </div>
+                    <div class="entry-title">${escapeHtml(entry.title)}</div>
+                    <div class="entry-body">${escapeHtml(entry.notes)}</div>
+                    ${entry.image ? `<div class="entry-image-container"><img src="${entry.image}" alt="Entry photo"></div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Plans Management
+        function addPlan(sectionKey) {
+            const input = document.getElementById(`${sectionKey}-plan-input`);
+            const planText = input.value.trim();
+            if (!planText) return;
+
+            gardenData.sections[sectionKey].plans.push({
+                id: Date.now(),
+                text: planText
+            });
+            saveData();
+            input.value = '';
+            renderPlans(sectionKey);
+        }
+
+        function deletePlan(sectionKey, planId) {
+            gardenData.sections[sectionKey].plans = gardenData.sections[sectionKey].plans.filter(p => p.id !== planId);
+            saveData();
+            renderPlans(sectionKey);
+        }
+
+        function renderPlans(sectionKey) {
+            const list = document.getElementById(`${sectionKey}-plans`);
+            const plans = gardenData.sections[sectionKey].plans;
+
+            if (plans.length === 0) {
+                list.innerHTML = '<li style="background: none; border: none; color: #777; font-size: 0.85rem; padding: 0.2rem 0;">No active plans listed.</li>';
+                return;
+            }
+
+            list.innerHTML = plans.map(plan => `
+                <li>
+                    <span>${escapeHtml(plan.text)}</span>
+                    <button onclick="deletePlan('${sectionKey}', ${plan.id})">Done</button>
+                </li>
+            `).join('');
+        }
+
+        // Plants Database Management
+        function addPlant(event) {
+            event.preventDefault();
+            const name = document.getElementById('plant-name').value;
+            const notes = document.getElementById('plant-notes').value;
+            const fileInput = document.getElementById('plant-photo');
+
+            processImageAndCallback(fileInput, (imageStr) => {
+                const newPlant = {
+                    id: Date.now(),
+                    name,
+                    notes,
+                    image: imageStr
+                };
+
+                gardenData.plants.unshift(newPlant);
+                saveData();
+                renderPlants();
+
+                event.target.reset();
+            });
+        }
+
+        function deletePlant(plantId) {
+            gardenData.plants = gardenData.plants.filter(p => p.id !== plantId);
+            saveData();
+            renderPlants();
+        }
+
+        function renderPlants() {
+            const container = document.getElementById('plants-container');
+            const plants = gardenData.plants;
+
+            if (plants.length === 0) {
+                container.innerHTML = '<p style="color: #777; font-size: 0.9rem; grid-column: 1/-1;">No plants added to the database yet.</p>';
+                return;
+            }
+
+            container.innerHTML = plants.map(plant => `
+                <div class="plant-card">
+                    <div class="plant-img-wrapper">
+                        ${plant.image ? `<img src="${plant.image}" alt="${escapeHtml(plant.name)}">` : 'No Photo Available'}
+                    </div>
+                    <div class="plant-card-content">
+                        <div>
+                            <div class="plant-name">${escapeHtml(plant.name)}</div>
+                            <div class="plant-notes">${escapeHtml(plant.notes)}</div>
+                        </div>
+                        <div class="plant-footer">
+                            <button class="delete-entry-btn" onclick="deletePlant(${plant.id})">Remove Plant</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize display from localStorage state
+        function loadData() {
+            const sections = ['shaded', 'rockery', 'veggie', 'front-rocky', 'misc'];
+            sections.forEach(sec => {
+                renderEntries(sec);
+                renderPlans(sec);
+            });
+            renderPlants();
+        }
+
+        // Data Backup / Export Feature
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gardenData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `my_garden_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Data Restore / Import Feature
+        function importData(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function(e) {
+                    try {
+                        const parsedData = JSON.parse(e.target.result);
+                        if (parsedData.sections && parsedData.plants) {
+                            gardenData = parsedData;
+                            saveData();
+                            loadData();
+                            alert("Garden journal restored successfully!");
+                        } else {
+                            alert("Invalid backup file structure.");
+                        }
+                    } catch (error) {
+                        alert("Error parsing JSON file.");
+                    }
+                };
+            }
+        }
+
+        // Basic XSS protection utility
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
